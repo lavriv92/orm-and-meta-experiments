@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from .exceptions import RecordNotFound
 
 from .query_builder import QueryBuilder
-from .utils import get_keys, parse_connection_string
+from .utils import get_selection_keys, parse_connection_string
 
 
 class BaseEngine(ABC):
@@ -16,10 +16,6 @@ class BaseEngine(ABC):
     @abstractmethod
     def close():
         pass
-
-    # @abstractmethod
-    # def execute(self, query):
-    #     pass
 
     @abstractmethod
     def commit(self):
@@ -42,11 +38,6 @@ class SQlite3(BaseEngine):
         self.connection = sqlite3.connect(self.uri)
         return self
 
-    # def execute(self, query):
-    #     results = self.database.execute(query)
-
-    #     return {"results": results, "id": results.lastrowid}
-
     def commit(self):
         return self.connection.commit()
 
@@ -54,20 +45,29 @@ class SQlite3(BaseEngine):
         query = QueryBuilder(instance.__class__).create(instance).build()
         res = self.connection.execute(query)
 
-        setattr(instance, "id", res["id"])
+        setattr(instance, "id", res.lastrowid)
 
         return instance
 
+    def get(self, model, id):
+        query = QueryBuilder(model).select().where(id=id).limit(1).build()
+        results = self.connection.execute(query)
+        item = list(results)[0]
+
+        keys = get_selection_keys(model)
+
+        mapped_item = dict(zip(keys, item))
+
+        return model(**mapped_item)
+
     def select(self, model):
         query = QueryBuilder(model).select().build()
-
-        print("query", query)
-
         results = self.connection.execute(query)
-        keys = get_keys(model)
+        keys = get_selection_keys(model)
 
         for row in results:
-            yield model(**{k: v for k, v in zip(keys, row)})
+            mapped_item = dict(zip(keys, row))
+            yield model(**mapped_item)
 
     def close(self):
         return self.connection.close()

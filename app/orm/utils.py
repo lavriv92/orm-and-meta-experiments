@@ -36,4 +36,8 @@ def get_keys(model):
     keys = vars(model).get("__annotations__", {}).keys()
     formatted_keys = [f"{key}" for key in keys]
 
-    return ["id"] + formatted_keys
+    return formatted_keys
+
+
+def get_selection_keys(model):
+    return ["id"] + get_keys(model)

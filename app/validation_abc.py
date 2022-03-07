@@ -32,9 +32,22 @@ if __name__ == "__main__":
     db = create_database("sqlite3://my-database.sqlite3")
 
     with db.connection() as conn:
-        results = conn.select(User)
+        user = conn.get(User, 1)
 
-        print(list(results))
+        users = conn.select(User)
+
+        users_json = [u.dict for u in users]
+
+        print("users: ", users_json)
+
+        print("user", user)
+
+        # user = User(name="Example user", age=18)
+
+        # user = conn.add(user)
+        # conn.commit()
+
+        # print("new user", user)
 
     # try:
     #     user = User(**{"name": "Test User", "age": 18})

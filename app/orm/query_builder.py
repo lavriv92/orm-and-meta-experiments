@@ -1,5 +1,5 @@
 from .exceptions import InvalidQuery
-from .utils import get_keys, get_tablename
+from .utils import get_keys, get_selection_keys, get_tablename
 
 
 class QueryBuilder:
@@ -14,7 +14,7 @@ class QueryBuilder:
 
     @property
     def __formatted_keys(self):
-        return ",".join(get_keys(self.model))
+        return ",".join(get_selection_keys(self.model))
 
     def __format_values(self, instance):
         values = [f"{v!r}" for v in vars(instance).values()]
@@ -22,7 +22,9 @@ class QueryBuilder:
         return ",".join(values)
 
     def create(self, instance):
-        self.__tmp_query = f"INSERT INTO {self.__table_name}({self.__formatted_keys}) VALUES({self.__format_values(instance)})"
+        keys = ",".join(get_keys(instance.__class__))
+
+        self.__tmp_query = f"INSERT INTO {self.__table_name}({keys}) VALUES({self.__format_values(instance)})"
         return self
 
     def build(self):
