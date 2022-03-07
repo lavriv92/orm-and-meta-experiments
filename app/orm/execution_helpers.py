@@ -1,4 +1,4 @@
-from .query_builder import QueryBuilder
+from .sql.query_builder import QueryBuilder
 
 
 def select(model):

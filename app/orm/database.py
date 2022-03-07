@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 from .exceptions import RecordNotFound
 
-from .query_builder import QueryBuilder
+from .sql.query_builder import QueryBuilder
 from .utils import get_selection_keys, parse_connection_string
 
 
@@ -49,19 +49,20 @@ class SQlite3(BaseEngine):
 
         return instance
 
-    def get(self, model, id):
-        query = QueryBuilder(model).select().where(id=id).limit(1).build()
-        results = self.connection.execute(query)
-        item = list(results)[0]
+    def get(self, model, id, fields=[]):
+        query = QueryBuilder(model).select(fields).where(id=id).limit(1).build()
+        item = self.connection.execute(query).fetchone()
+
+        if item is None:
+            raise RecordNotFound(f"{model.__name__} by {id!r} not found")
 
         keys = get_selection_keys(model)
-
         mapped_item = dict(zip(keys, item))
 
         return model(**mapped_item)
 
-    def select(self, model):
-        query = QueryBuilder(model).select().build()
+    def select(self, model, fields=[]):
+        query = QueryBuilder(model).select(fields).build()
         results = self.connection.execute(query)
         keys = get_selection_keys(model)
 

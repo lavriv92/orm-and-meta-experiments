@@ -20,3 +20,7 @@ class InvalidQuery(Exception):
 
 class RecordNotFound(Exception):
     pass
+
+
+class UnsupportableLookup(Exception):
+    pass

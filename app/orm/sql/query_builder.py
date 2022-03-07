@@ -1,5 +1,6 @@
-from .exceptions import InvalidQuery
-from .utils import get_keys, get_selection_keys, get_tablename
+from ..exceptions import InvalidQuery
+from ..utils import get_keys, get_selection_keys, get_tablename
+from .utils import normalize_conditions
 
 
 class QueryBuilder:
@@ -30,7 +31,7 @@ class QueryBuilder:
     def build(self):
         return f"{self.__tmp_query};"
 
-    def select(self):
+    def select(self, fields):
         self.__tmp_query = f"SELECT {self.__formatted_keys} FROM {self.__table_name}"
         return self
 
@@ -38,9 +39,8 @@ class QueryBuilder:
         if self.__tmp_query is None:
             raise InvalidQuery("Tmp query shold be not start from where")
 
-        formatted_conditions = [f"{key}={value}" for key, value in conditions.items()]
-        sql_cond = " AND ".join(formatted_conditions)
-        self.__tmp_query += f" WHERE {sql_cond}"
+        formatted_conditions = normalize_conditions(conditions)
+        self.__tmp_query += f" WHERE {formatted_conditions}"
 
         return self
 

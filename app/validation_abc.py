@@ -32,34 +32,10 @@ if __name__ == "__main__":
     db = create_database("sqlite3://my-database.sqlite3")
 
     with db.connection() as conn:
-        user = conn.get(User, 1)
-
+        user = conn.get(User, 3)
         users = conn.select(User)
-
         users_json = [u.dict for u in users]
 
         print("users: ", users_json)
 
-        print("user", user)
-
-        # user = User(name="Example user", age=18)
-
-        # user = conn.add(user)
-        # conn.commit()
-
-        # print("new user", user)
-
-    # try:
-    #     user = User(**{"name": "Test User", "age": 18})
-
-    #     with create_database("sqlite3://my-database.sqlite3") as db:
-    #         db.add(user)
-    #         db.commit()
-
-    #         # results = db.select(User)
-
-    #         # print("r", results)
-
-    #         # print("user", u.dict)
-    # except ValidationError as e:
-    #     print("errors:", e.json)
+        print("user", user.dict)
