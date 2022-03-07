@@ -1,5 +1,6 @@
 from statistics import mode
 from typing import get_origin, get_args, Union
+from .fields import RelationField
 
 
 def is_optional(annotation):
@@ -54,8 +55,9 @@ def get_formatted_keys(model):
 
 
 def generate_model_keys(model):
-    for key in iter(vars(model).get("__annotations__", {}).keys()):
-        yield key
+    for key, val in iter(vars(model).get("__annotations__", {}).items()):
+        if not isinstance(val, RelationField):
+            yield key
 
 
 def get_serialization_keys(model):

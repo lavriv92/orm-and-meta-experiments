@@ -4,9 +4,8 @@ from .utils import normalize_conditions
 
 
 class QueryBuilder:
-    __tmp_query = None
-
     def __init__(self, model):
+        self.__segments = []
         self.model = model
 
     @property
@@ -20,43 +19,46 @@ class QueryBuilder:
     def __format_values(self, instance):
         values = [f"{v!r}" for v in vars(instance).values()]
 
-        return ",".join(values)
+        return ", ".join(values)
 
     def create(self, instance):
         keys = ",".join(get_keys(instance.__class__))
 
-        self.__tmp_query = f"INSERT INTO {self.__table_name}({keys}) VALUES({self.__format_values(instance)})"
+        self.__segments.append(
+            f"INSERT INTO {self.__table_name}({keys}) VALUES ({self.__format_values(instance)})"
+        )
         return self
 
     def build(self):
-        return f"{self.__tmp_query};"
+        return " ".join(self.__segments)
 
     def select(self, fields):
-        self.__tmp_query = f"SELECT {self.__formatted_keys} FROM {self.__table_name}"
+        self.__segments.append(
+            f"SELECT {self.__formatted_keys} FROM {self.__table_name}"
+        )
         return self
 
     def where(self, **conditions: dict):
-        if self.__tmp_query is None:
+        if not self.__segments:
             raise InvalidQuery("Tmp query shold be not start from where")
 
-        formatted_conditions = normalize_conditions(conditions)
-        self.__tmp_query += f" WHERE {formatted_conditions}"
+        self.__segments.append(f"WHERE {normalize_conditions(conditions)}")
 
         return self
 
     def skip(self, number):
-        if self.__tmp_query is None:
+        if not self.__segments:
             raise InvalidQuery("Tmp query shold be not start from where")
 
-        self.__tmp_query += f" OFFSET {number}"
+        self.__segments.append(f"OFFSET {number}")
 
         return self
 
     def limit(self, limit):
-        if self.__tmp_query is None:
+        if not self.__segments:
             raise InvalidQuery("Tmp query is invalid")
 
-        self.__tmp_query += f" LIMIT {limit}"
+        self.__segments.append(f"LIMIT {limit}")
 
         return self
 

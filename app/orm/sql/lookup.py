@@ -13,7 +13,7 @@ def format_sequence(seq):
 
 
 def lookup_in(field: str, value):
-    return f" {field} IN ({format_sequence(value)}) "
+    return f"{field} IN ({format_sequence(value)}) "
 
 
 def lookup_gt(field: str, value):

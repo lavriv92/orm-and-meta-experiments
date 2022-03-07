@@ -24,3 +24,11 @@ class RecordNotFound(Exception):
 
 class UnsupportableLookup(Exception):
     pass
+
+
+class ModelIsNotExists(Exception):
+    pass
+
+
+class IsNotModel(Exception):
+    pass

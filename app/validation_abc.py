@@ -2,7 +2,7 @@ from typing import Optional
 
 import rich
 
-from orm import Model, validator, create_database
+from orm import Model, validator, create_database, relation, RelationTypes
 
 print = rich.print
 
@@ -19,7 +19,7 @@ class User(Model):
 
     @validator("name")
     def validate_name(self, value: str, *args, **kwargs):
-        if len(value) < 6:
+        if len(value) < 3:
             raise ValueError("Value length shold be longest then 6")
 
     @validator("age")
@@ -28,14 +28,40 @@ class User(Model):
             raise ValueError("Age must bet at least 18")
 
 
+@relation("User", relation_type=RelationTypes.ONE_TO_MANY)
+class Post(Model):
+    title: str
+    content: str
+
+    def __str__(self):
+        return f"Post(id={self.id}, title={self.title!r}, content={self.content!r})"
+
+    def __repr__(self):
+        return self.__str__()
+
+
 if __name__ == "__main__":
     db = create_database("sqlite3://my-database.sqlite3")
 
     with db.connection() as conn:
-        user = conn.get(User, 3)
-        users = conn.select(User)
-        users_json = [u.dict for u in users]
+        # user = User(name="Ivan", age=18)
 
-        print("users: ", users_json)
+        # conn.add(user)
+        # conn.commit()
 
-        print("user", user.dict)
+        post = Post(title="test post", content="post content", user_id=1)
+
+        post.user = "Test"
+
+        print(post.user)
+
+        # print("post.user", post.user)
+
+        # conn.add(post)
+        # conn.commit()
+
+        # user = conn.get(User, 1)
+
+        # posts = conn.select(Post)
+        # posts_json = [p for p in posts]
+        # print("posts: ", posts_json)

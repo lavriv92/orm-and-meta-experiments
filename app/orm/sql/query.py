@@ -11,12 +11,16 @@ class Query:
     def select(self, params):
         self.query = self.query.select(params)
 
+        return self
+
     @property
     def __final_query(self):
         return self.query.build()
 
     def where(self, **conditions: dict):
         self.query = self.query.where(conditions)
+
+        return self
 
     def all(self):
         results = self.engine.execute(self.__final_query).fetchall()

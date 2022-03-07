@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from .utils import is_optional, get_origin_type
 from .exceptions import ValidationError
+from .fields import FieldDecriptor
 
 
 class ModelMeta(type):
@@ -26,7 +27,11 @@ class ModelMeta(type):
             value = kwargs.get(field_name)
 
             try:
-                if not is_optional(annotation) and value is None:
+                if (
+                    not is_optional(annotation)
+                    and not isinstance(annotation, FieldDecriptor)
+                    and value is None
+                ):
                     raise ValueError(f"Field {field_name!r} is required")
 
                 if value is None:
@@ -60,6 +65,7 @@ class Model(metaclass=ModelMeta):
     _errors = defaultdict(list)
 
     def __init__(self, *args, **kwargs):
+        self.id = None
         for key, val in kwargs.items():
             setattr(self, key, val)
 
