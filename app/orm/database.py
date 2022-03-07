@@ -63,6 +63,9 @@ class SQlite3(BaseEngine):
 
     def select(self, model, fields=[]):
         query = QueryBuilder(model).select(fields).build()
+
+        print("query", query)
+
         results = self.connection.execute(query)
         keys = get_selection_keys(model)
 
