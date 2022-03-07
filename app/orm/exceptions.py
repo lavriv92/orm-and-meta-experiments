@@ -16,3 +16,7 @@ class ValidationError(Exception):
 
 class InvalidQuery(Exception):
     pass
+
+
+class RecordNotFound(Exception):
+    pass

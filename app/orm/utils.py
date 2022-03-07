@@ -34,5 +34,6 @@ def get_tablename(model):
 
 def get_keys(model):
     keys = vars(model).get("__annotations__", {}).keys()
+    formatted_keys = [f"{key}" for key in keys]
 
-    return ["id", *keys]
+    return ["id"] + formatted_keys

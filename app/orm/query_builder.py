@@ -1,5 +1,5 @@
 from .exceptions import InvalidQuery
-from .utils import get_tablename
+from .utils import get_keys, get_tablename
 
 
 class QueryBuilder:
@@ -14,8 +14,7 @@ class QueryBuilder:
 
     @property
     def __formatted_keys(self):
-        keys = vars(self.model).get("__annotations__").keys()
-        return ",".join(keys)
+        return ",".join(get_keys(self.model))
 
     def __format_values(self, instance):
         values = [f"{v!r}" for v in vars(instance).values()]
@@ -30,16 +29,15 @@ class QueryBuilder:
         return f"{self.__tmp_query};"
 
     def select(self):
-        self.__tmp_query = f"SELECT id,{self.__formatted_keys} FROM {self.__table_name}"
+        self.__tmp_query = f"SELECT {self.__formatted_keys} FROM {self.__table_name}"
         return self
 
     def where(self, **conditions: dict):
         if self.__tmp_query is None:
             raise InvalidQuery("Tmp query shold be not start from where")
 
-        vars = [f"{key}={value}" for key, value in conditions.items()]
-        sql_cond += " AND ".join(vars)
-
+        formatted_conditions = [f"{key}={value}" for key, value in conditions.items()]
+        sql_cond = " AND ".join(formatted_conditions)
         self.__tmp_query += f" WHERE {sql_cond}"
 
         return self
@@ -60,5 +58,5 @@ class QueryBuilder:
 
         return self
 
-    def join(self, other):
+    def join(self, other_model):
         pass

@@ -2,7 +2,7 @@ from typing import Optional
 
 import rich
 
-from orm import Model, ValidationError, validator, create_database
+from orm import Model, validator, create_database
 
 print = rich.print
 
@@ -29,17 +29,24 @@ class User(Model):
 
 
 if __name__ == "__main__":
-    try:
-        user = User(**{"name": "Test User", "age": 18})
+    db = create_database("sqlite3://my-database.sqlite3")
 
-        with create_database("sqlite3://my-database.sqlite3") as db:
-            db.add(user)
-            db.commit()
+    with db.connection() as conn:
+        results = conn.select(User)
 
-            # results = db.select(User)
+        print(list(results))
 
-            # print("r", results)
+    # try:
+    #     user = User(**{"name": "Test User", "age": 18})
 
-            # print("user", u.dict)
-    except ValidationError as e:
-        print("errors:", e.json)
+    #     with create_database("sqlite3://my-database.sqlite3") as db:
+    #         db.add(user)
+    #         db.commit()
+
+    #         # results = db.select(User)
+
+    #         # print("r", results)
+
+    #         # print("user", u.dict)
+    # except ValidationError as e:
+    #     print("errors:", e.json)
