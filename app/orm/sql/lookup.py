@@ -1,8 +1,15 @@
 from ..exceptions import UnsupportableLookup
 
 
+def format_in_field(item):
+    if isinstance(item, str):
+        return f"{item!r}"
+
+    return str(item)
+
+
 def format_sequence(seq):
-    return ", ".join(map(str, seq))
+    return ", ".join(map(format_in_field, seq))
 
 
 def lookup_in(field: str, value):
