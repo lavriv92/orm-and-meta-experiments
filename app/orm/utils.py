@@ -1,4 +1,4 @@
-from cgitb import lookup
+from statistics import mode
 from typing import get_origin, get_args, Union
 
 
@@ -40,5 +40,28 @@ def get_keys(model):
     return formatted_keys
 
 
-def get_selection_keys(model):
-    return ["id"] + get_keys(model)
+def format_key(model, key):
+    return f"{get_tablename(model)}.{key} AS {key}"
+
+
+def get_formatted_keys(model):
+    keys = [format_key(model, "id")]
+
+    for key in generate_model_keys(model):
+        keys.append(format_key(model, key))
+
+    return keys
+
+
+def generate_model_keys(model):
+    for key in iter(vars(model).get("__annotations__", {}).keys()):
+        yield key
+
+
+def get_serialization_keys(model):
+    keys = ["id"]
+
+    for key in generate_model_keys(model):
+        keys.append(key)
+
+    return keys

@@ -1,5 +1,5 @@
 from ..exceptions import InvalidQuery
-from ..utils import get_keys, get_selection_keys, get_tablename
+from ..utils import get_formatted_keys, get_keys, get_tablename
 from .utils import normalize_conditions
 
 
@@ -15,7 +15,7 @@ class QueryBuilder:
 
     @property
     def __formatted_keys(self):
-        return ",".join(get_selection_keys(self.model))
+        return ", ".join(get_formatted_keys(self.model))
 
     def __format_values(self, instance):
         values = [f"{v!r}" for v in vars(instance).values()]

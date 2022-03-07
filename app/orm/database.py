@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from .exceptions import RecordNotFound
 
 from .sql.query_builder import QueryBuilder
-from .utils import get_selection_keys, parse_connection_string
+from .utils import parse_connection_string, get_serialization_keys
 
 
 class BaseEngine(ABC):
@@ -56,18 +56,15 @@ class SQlite3(BaseEngine):
         if item is None:
             raise RecordNotFound(f"{model.__name__} by {id!r} not found")
 
-        keys = get_selection_keys(model)
+        keys = get_serialization_keys(model)
         mapped_item = dict(zip(keys, item))
 
         return model(**mapped_item)
 
     def select(self, model, fields=[]):
         query = QueryBuilder(model).select(fields).build()
-
-        print("query", query)
-
         results = self.connection.execute(query)
-        keys = get_selection_keys(model)
+        keys = get_serialization_keys(model)
 
         for row in results:
             mapped_item = dict(zip(keys, row))

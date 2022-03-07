@@ -21,15 +21,7 @@ class ModelMeta(type):
             if getattr(validator, "__validated_field__", None) == field_name
         )
 
-    def __validate_required(self, value):
-        pass
-
-    def __validate_type(value):
-        pass
-
     def __call__(self, *args, **kwargs):
-        errors = defaultdict(list)
-
         for field_name, annotation in self.__field_annotations.items():
             value = kwargs.get(field_name)
 
